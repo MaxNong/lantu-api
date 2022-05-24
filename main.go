@@ -6,6 +6,8 @@ import (
 	"lantu/middleware"
 	"lantu/routers"
 	"lantu/setting"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -23,11 +25,14 @@ func main() {
 	}
 	defer dao.Close() // 程序退出关闭数据库连接
 
-	// 初始化gin Engine和路由
-	r := routers.SetupRouters()
+	// 初始化gin engine
+	r := gin.Default()
 
 	// 初始化中间件
 	middleware.InitMiddleware(r)
+
+	// 初始化gin Engine和路由
+	routers.SetupRouters(r)
 
 	// 启动服务
 	r.Run(":9090")

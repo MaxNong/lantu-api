@@ -6,9 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouters() *gin.Engine {
-	r := gin.Default()
-
+func SetupRouters(r *gin.Engine) *gin.Engine {
 	// 设置静态目录
 	r.Static("/static", "static")
 
@@ -16,6 +14,7 @@ func SetupRouters() *gin.Engine {
 	userGroup := r.Group("/user")
 	{
 		userGroup.GET("/login", controller.Login)
+		userGroup.POST("/sendRegisterEmail", controller.SendRegisterEmail)
 	}
 
 	return r

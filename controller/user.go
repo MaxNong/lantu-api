@@ -2,10 +2,12 @@ package controller
 
 import (
 	"fmt"
+	"lantu/dao"
 	"lantu/logic"
 	"lantu/models"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +46,8 @@ func SendRegisterEmail(ctx *gin.Context) {
 
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	code := fmt.Sprintf("%06v", rnd.Int31n(1000000))
+	// 将 邮箱-验证码 存入redis
+	dao.RedisSet(registerEmail+"emailCode", registerEmail+code)
 	// 邮件接收方
 	mailTo := []string{
 		registerEmail,
@@ -65,6 +69,37 @@ func SendRegisterEmail(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"msg":     "发送成功",
+		})
+	}
+}
+
+func Register(ctx *gin.Context) {
+	registerEmail := ctx.PostForm("email")
+	registerCode := ctx.PostForm("code")
+	password := ctx.PostForm("password")
+
+	emailCode := dao.RedisGet(registerEmail + "emailCode")
+	fmt.Printf("emailCode: %v\n", emailCode)
+
+	if emailCode != registerEmail+registerCode {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"msg":     "验证码错误",
+		})
+		return
+	}
+
+	umAccount := strings.Split(registerEmail, "@")
+	isSuccess := models.InsertUser(umAccount[0], password)
+	if isSuccess {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"msg":     "注册成功",
+		})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"msg":     "注册成功",
 		})
 	}
 }

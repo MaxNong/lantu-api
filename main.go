@@ -25,6 +25,9 @@ func main() {
 	}
 	defer dao.Close() // 程序退出关闭数据库连接
 
+	// 初始化redis
+	dao.InitRedis()
+
 	// 初始化gin engine
 	r := gin.Default()
 

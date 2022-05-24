@@ -35,3 +35,19 @@ func QueryUserByUsernameAndPassword(username string, password string) (user User
 		return u, nil
 	}
 }
+
+func InsertUser(username string, password string) bool {
+	s := "insert into user_tbl(username,password) values(?,?)"
+	ret, err := dao.DB.Exec(s, username, password)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return false
+	}
+	theId, err := ret.LastInsertId()
+	if err != nil {
+		fmt.Printf("get lastInsert id failed, err: %v\n", err)
+		return false
+	}
+	fmt.Printf("get lastInsert id success, theId: %v\n", theId)
+	return true
+}

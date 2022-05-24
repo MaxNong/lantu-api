@@ -15,6 +15,7 @@ func SetupRouters(r *gin.Engine) *gin.Engine {
 	{
 		userGroup.GET("/login", controller.Login)
 		userGroup.POST("/sendRegisterEmail", controller.SendRegisterEmail)
+		userGroup.POST("/register", controller.Register)
 	}
 
 	return r
